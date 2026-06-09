@@ -20,44 +20,30 @@ Graph-based memory for LLM agents. Connects your Hermes Agent to a MemFlux insta
 
 ## Setup
 
-### 1. Get a MemFlux API key
-
-Sign up at [memflux.org](https://memflux.org) and create an API key (`gc_sk_...`).
-
-### 2. Install the plugin
+### 1. Install the plugin
 
 ```bash
-# Copy to your Hermes plugins directory
-cp -r memflux_plugin/ ~/.hermes/plugins/memflux/
-
-# Or with the Hermes CLI
-hermes plugins install memflux
+hermes plugins install sXrja/memflux --enable
 ```
 
-### 3. Configure
+### 2. Get a MemFlux API key
 
-Add to your `~/.hermes/.env`:
+Sign up at [memflux.org](https://memflux.org), log in, and create an API key (`gc_sk_...`).
 
-```env
-GRAPHCORE_API_KEY=gc_sk_your_key_here
-GRAPHCORE_BASE_URL=https://memflux.org
-```
-
-Or set in `config.yaml`:
-
-```yaml
-memory:
-  provider: graphcore
-
-graphcore:
-  api_key: gc_sk_your_key_here
-  base_url: https://memflux.org
-```
-
-### 4. Activate
+### 3. Add your API key
 
 ```bash
-hermes config set memory.provider graphcore
+# Option A: Hermes auth (recommended — stored securely)
+hermes auth add memflux --type api-key --api-key gc_sk_your_key_here
+
+# Option B: Environment variable in .env
+echo "MEMFLUX_API_KEY=gc_sk_your_key_here" >> ~/.hermes/.env
+```
+
+### 4. Activate as memory provider
+
+```bash
+hermes config set memory.provider memflux
 ```
 
 Takes effect on next session (`/reset` or new chat).
@@ -66,8 +52,10 @@ Takes effect on next session (`/reset` or new chat).
 
 | Env Var | Description | Default |
 |---------|-------------|---------|
-| `GRAPHCORE_API_KEY` | MemFlux API key (gc_sk_...) | Required |
-| `GRAPHCORE_BASE_URL` | MemFlux API endpoint | `https://memflux.org` |
+| `MEMFLUX_API_KEY` | MemFlux API key (gc_sk_...) | Required |
+| `MEMFLUX_BASE_URL` | MemFlux API endpoint | `https://memflux.org` |
+
+> **Backward compat**: `GRAPHCORE_API_KEY` and `GRAPHCORE_BASE_URL` still work as fallbacks.
 
 ## Self-Hosting
 

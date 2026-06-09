@@ -12,8 +12,8 @@ Features:
 - API-key auth (shared or per-user key)
 
 Config (env vars or hermes config.yaml under graphcore:):
-  GRAPHCORE_API_KEY   — API key (required)
-  GRAPHCORE_BASE_URL  — API endpoint (default: https://memflux.org)
+  MEMFLUX_API_KEY   — API key (required)
+  MEMFLUX_BASE_URL  — API endpoint (default: https://memflux.org)
 """
 
 from __future__ import annotations
@@ -181,14 +181,14 @@ class GraphCoreMemoryProvider(MemoryProvider):
 
     @property
     def name(self) -> str:
-        return "graphcore"
+        return "memflux"
 
     # -- Availability --------------------------------------------------------
 
     def is_available(self) -> bool:
         """Check if GraphCore API is reachable and has an API key."""
-        api_key = os.getenv("GRAPHCORE_API_KEY", "")
-        base_url = os.getenv("GRAPHCORE_BASE_URL", _DEFAULT_BASE_URL)
+        api_key = os.getenv("MEMFLUX_API_KEY", os.getenv("GRAPHCORE_API_KEY", ""))
+        base_url = os.getenv("MEMFLUX_BASE_URL", os.getenv("GRAPHCORE_BASE_URL", _DEFAULT_BASE_URL))
         if not api_key:
             return False
         result = _api_call("GET", "/health", base_url, api_key, timeout=2.0)
@@ -197,15 +197,15 @@ class GraphCoreMemoryProvider(MemoryProvider):
     # -- Core lifecycle ------------------------------------------------------
 
     def initialize(self, session_id: str, **kwargs) -> None:
-        self._base_url = os.getenv("GRAPHCORE_BASE_URL", _DEFAULT_BASE_URL)
-        self._api_key = os.getenv("GRAPHCORE_API_KEY", "")
+        self._base_url = os.getenv("MEMFLUX_BASE_URL", os.getenv("GRAPHCORE_BASE_URL", _DEFAULT_BASE_URL))
+        self._api_key = os.getenv("MEMFLUX_API_KEY", os.getenv("GRAPHCORE_API_KEY", ""))
         self._session_id = session_id
         self._user_id = kwargs.get("user_id", "hermes")
         self._platform = kwargs.get("platform", "cli")
         self._turn_counter = 0
 
         if not self._api_key:
-            logger.warning("GraphCore: no GRAPHCORE_API_KEY set — provider inactive")
+            logger.warning("MemFlux: no MEMFLUX_API_KEY set — provider inactive")
             return
 
         # Start background writer thread
@@ -404,17 +404,17 @@ class GraphCoreMemoryProvider(MemoryProvider):
         return [
             {
                 "key": "api_key",
-                "description": "GraphCore API key (gc_sk_...)",
+                "description": "MemFlux API key (gc_sk_...)",
                 "secret": True,
                 "required": True,
-                "env_var": "GRAPHCORE_API_KEY",
+                "env_var": "MEMFLUX_API_KEY",
             },
             {
                 "key": "base_url",
-                "description": "GraphCore API base URL",
+                "description": "MemFlux API base URL",
                 "required": False,
                 "default": _DEFAULT_BASE_URL,
-                "env_var": "GRAPHCORE_BASE_URL",
+                "env_var": "MEMFLUX_BASE_URL",
             },
         ]
 

@@ -1,4 +1,4 @@
-name: graphcore
+name: memflux
 version: "1.0.0"
 description: "MemFlux graph memory — entities, relations, and context generation for LLM agents via memflux.org"
 author: HEETH
